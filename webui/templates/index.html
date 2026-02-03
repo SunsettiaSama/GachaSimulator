@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽卡模拟器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 抽卡模拟器</h1>
+            <p class="subtitle">独立同分布（i.i.d.）抽卡系统</p>
+        </header>
+
+        <!-- 池子切换 -->
+        <div class="pool-selector-section">
+            <h2>选择池子</h2>
+            <div class="pool-selector">
+                <button class="pool-btn active" data-pool="character" onclick="switchPool('character')">
+                    <span class="pool-icon">👤</span>
+                    <span class="pool-name">角色祈愿</span>
+                </button>
+                <button class="pool-btn" data-pool="weapon" onclick="switchPool('weapon')">
+                    <span class="pool-icon">⚔️</span>
+                    <span class="pool-name">神铸赋形</span>
+                </button>
+            </div>
+            <div class="pool-info" id="poolInfo">
+                <p id="poolDescription">角色祈愿 - 概率UP！限定五星角色</p>
+            </div>
+        </div>
+
+        <!-- 概率显示 -->
+        <div class="probability-section">
+            <h2>抽卡概率</h2>
+            <div class="probability-grid">
+                <!-- 动态生成概率卡片 -->
+            </div>
+        </div>
+
+        <!-- 保底状态显示 -->
+        <div class="pity-section">
+            <h2>保底状态</h2>
+            <div class="pity-grid">
+                <div class="pity-card">
+                    <div class="pity-label">距上次SSR</div>
+                    <div class="pity-value" id="drawsSinceSsr">0 抽</div>
+                </div>
+                <div class="pity-card">
+                    <div class="pity-label">当前SSR概率</div>
+                    <div class="pity-value" id="currentSsrProb">0.60%</div>
+                </div>
+                <div class="pity-card">
+                    <div class="pity-label">距离小保底</div>
+                    <div class="pity-value" id="untilHardPity">90 抽</div>
+                </div>
+                <div class="pity-card">
+                    <div class="pity-label">距大保底</div>
+                    <div class="pity-value" id="untilBigPity">180 抽</div>
+                </div>
+                <div class="pity-card guaranteed" id="guaranteedCard" style="display: none;">
+                    <div class="pity-label">下次保底UP</div>
+                    <div class="pity-value">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 抽卡按钮 -->
+        <div class="action-section">
+            <button class="btn btn-single" onclick="singleDraw()">
+                <span class="btn-icon">🎯</span>
+                单抽
+            </button>
+            <button class="btn btn-multi" onclick="multiDraw()">
+                <span class="btn-icon">💫</span>
+                十连抽
+            </button>
+            <button class="btn btn-reset" onclick="resetStats()">
+                <span class="btn-icon">🔄</span>
+                重置
+            </button>
+        </div>
+
+        <!-- 抽卡结果展示 -->
+        <div class="result-section">
+            <h2>抽卡结果</h2>
+            <div id="resultDisplay" class="result-display">
+                <p class="placeholder">点击按钮开始抽卡</p>
+            </div>
+        </div>
+
+        <!-- 模拟模式 -->
+        <div class="simulation-section">
+            <h2>模拟模式</h2>
+            <div class="simulation-controls">
+                <label for="simulationCount">模拟次数：</label>
+                <input type="number" id="simulationCount" value="100000" min="1000" max="10000000" step="1000">
+                <button class="btn btn-simulate" onclick="runSimulation()">
+                    <span class="btn-icon">⚡</span>
+                    开始模拟
+                </button>
+            </div>
+            <div id="simulationResult" class="simulation-result"></div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-section">
+            <h2>统计信息</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">总抽卡次数</div>
+                    <div class="stat-value" id="totalDraws">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">总回报</div>
+                    <div class="stat-value" id="totalRewards">0</div>
+                </div>
+                <div class="stat-card ssr">
+                    <div class="stat-label">SSR总数</div>
+                    <div class="stat-value" id="ssrCount">0 (0.00%)</div>
+                </div>
+                <div class="stat-card ssr-up">
+                    <div class="stat-label">UP SSR</div>
+                    <div class="stat-value" id="ssrUpCount">0</div>
+                </div>
+                <div class="stat-card ssr-non-up">
+                    <div class="stat-label">歪的SSR</div>
+                    <div class="stat-value" id="ssrNonUpCount">0</div>
+                </div>
+                <div class="stat-card sr">
+                    <div class="stat-label">SR</div>
+                    <div class="stat-value" id="srCount">0 (0.00%)</div>
+                </div>
+                <div class="stat-card r">
+                    <div class="stat-label">R</div>
+                    <div class="stat-value" id="rCount">0 (0.00%)</div>
+                </div>
+                <div class="stat-card n">
+                    <div class="stat-label">N</div>
+                    <div class="stat-value" id="nCount">0 (0.00%)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表 -->
+        <div class="chart-section">
+            <h2>理论值 vs 实际值对比</h2>
+            <div class="chart-controls">
+                <button class="btn btn-chart" onclick="showExpectedDrawsChart()">期望抽数</button>
+                <button class="btn btn-chart" onclick="showRewardsChart()">期望回报</button>
+                <button class="btn btn-chart" onclick="showVarianceChart()">标准差</button>
+            </div>
+            <canvas id="comparisonChart"></canvas>
+        </div>
+
+        <!-- 抽卡记录 -->
+        <div class="history-section">
+            <h2>抽卡记录（最近100次）</h2>
+            <div id="historyDisplay" class="history-display">
+                <p class="placeholder">暂无记录</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

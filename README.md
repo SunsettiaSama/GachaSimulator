@@ -3,7 +3,6 @@
 <div align="center">
 
 [![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 一个功能完整的抽卡模拟器，支持多种池子类型、保底机制、统计分析和Web可视化界面。
 
@@ -326,23 +325,6 @@ config = {
 - **[可视化工具](docs/visualize_tools/README.md)** - 可视化工具文档
 - **[API参考](docs/visualize_tools/API_REFERENCE.md)** - API速查表
 
-## 🎮 使用场景
-
-### 1. 抽卡概率研究
-分析不同保底机制对玩家体验的影响
-
-### 2. 游戏设计
-为游戏设计合理的抽卡概率和保底机制
-
-### 3. 数学建模
-研究抽卡系统的统计学特性
-
-### 4. 玩家工具
-帮助玩家了解抽卡机制和概率
-
-### 5. 教学演示
-用于概率论和统计学教学
-
 ## 🛠️ 技术栈
 
 - **核心**: Python 3.7+
@@ -350,6 +332,7 @@ config = {
 - **前端**: HTML5 + CSS3 + JavaScript
 - **图表**: Chart.js
 - **强化学习**: Gymnasium (可选)
+    - 基于强化学习的抽卡策略（待完善）
 
 ## 🧪 测试
 
@@ -381,16 +364,12 @@ python main_menu.py
 
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+MIT License
 
 ## ⚠️ 免责声明
 
 本项目仅用于学习和研究目的。所有概率数据和机制仅为模拟，不代表任何真实游戏的实际机制。
 
-## 🔗 相关链接
-
-- [项目主页](https://github.com/yourusername/GachaSimulator)
-- [问题反馈](https://github.com/yourusername/GachaSimulator/issues)
 
 ---
 
@@ -398,6 +377,5 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 **[⬆ 回到顶部](#gachasimulator---高级抽卡模拟器)**
 
-Made with ❤️ by GachaSimulator Team
-
+Made with ❤️ by SunsettiaSama
 </div>
